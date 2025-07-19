@@ -42,7 +42,9 @@ include_directories(${CMAKE_BINARY_DIR})
 file(GLOB sources "src/*.cpp")
 
 find_package(Qt5Core COMPONENTS QtGamepad REQUIRED)
-find_package(Qt5Gamepad REQUIRED)
+
+# [NEW] remove dependency on Qt5Gamepad in ubuntu 24.04 ARM64
+# find_package(Qt5Gamepad REQUIRED)
 
 set(OpenGL_GL_PREFERENCE LEGACY)
 
@@ -51,7 +53,10 @@ include_directories(${OPENGL_INCLUDE_DIR})
 
 add_executable(sim ${sources} ${tst_hdr_moc})
 target_link_libraries(sim biomimetics pthread lcm inih dynacore_param_handler 
-    Qt5::Widgets Qt5::Core Qt5::Gui Qt5::Gamepad ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
+    Qt5::Widgets Qt5::Core Qt5::Gui ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
+
+# [NEW] remove dependency on Qt5Gamepad in ubuntu 24.04 ARM64
+# target_link_libraries(Qt5::Gamepad)
 
 if (CMAKE_SYSTEM_NAME MATCHES Linux)
   target_link_libraries(sim rt ${GLUT_glut_LIBRARIES})

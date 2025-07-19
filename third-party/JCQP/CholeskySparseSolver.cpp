@@ -9,7 +9,7 @@
 #include "Timer.h"
 #include "amd.h"
 #include <iostream>
-#include <immintrin.h>
+// #include <immintrin.h> unusable in ARM64
 
 
 template<typename T>
