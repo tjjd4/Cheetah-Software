@@ -12,16 +12,20 @@
 #include <string.h>
 #include <unistd.h>
 
-#define termios asmtermios
+// using <termios.h> instead of <asm/termios.h>
+// #define termios asmtermios
 
-#include <asm/termios.h>
+// #include <asm/termios.h>
 
-#undef termios
+// #undef termios
+#define BOTHER 0010000
 
 #include <termios.h>
+#include <sys/ioctl.h>
 #include <math.h>
 #include <pthread.h>
-#include <stropts.h>
+// `ioctl()` definition was moved from <stropts.h> to <sys/ioctl.h> after ubuntu 20.04
+// #include <stropts.h>
 #include <endian.h>
 #include <stdint.h>
 
@@ -29,9 +33,11 @@
 
 void init_serial_for_sbus(int fd, int baud) {
   printf("\t[RT SERIAL] Configuring serial device...\n");
-  struct termios2 tty;
+  // struct termios2 tty;
+  // ioctl(fd, TCGETS2, &tty);
+  struct termios tty;
+  ioctl(fd, TCGETS, &tty);
 
-  ioctl(fd, TCGETS2, &tty);
   tty.c_cflag &= ~CBAUD;
   tty.c_cflag |= BOTHER;
   tty.c_ispeed = baud;
@@ -45,7 +51,7 @@ tty.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
 tty.c_cflag &= ~(CSIZE | PARENB);
 tty.c_cflag |= PARENB;
 tty.c_cflag &= ~PARODD;
-tty.c_cflag |=
+// tty.c_cflag |=
 tty.c_cflag |= CS8;
 
   // tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8;  // 8-bit chars
@@ -68,7 +74,8 @@ tty.c_cflag |= CS8;
   // tty.c_cflag &= ~CRTSCTS;
   // cfmakeraw(&tty);
 
-  ioctl(fd, TCSETS2, &tty);
+  // ioctl(fd, TCSETS2, &tty);
+  ioctl(fd, TCSETS, &tty);
 }
 
 /**
@@ -84,9 +91,11 @@ int set_interface_attribs_custom_baud(int fd, int speed, int parity, int port) {
   (void)port;
 
   printf("\t[RT SERIAL] Configuring serial device...\n");
-  struct termios2 tty;
+  // struct termios2 tty;
+  // ioctl(fd, TCGETS2, &tty);
+  struct termios tty;
+  ioctl(fd, TCGETS, &tty);
 
-  ioctl(fd, TCGETS2, &tty);
   tty.c_cflag &= ~CBAUD;
   tty.c_cflag |= BOTHER;
   tty.c_ispeed = speed;
@@ -112,7 +121,8 @@ int set_interface_attribs_custom_baud(int fd, int speed, int parity, int port) {
   tty.c_cflag &= ~CRTSCTS;
   // cfmakeraw(&tty);
 
-  ioctl(fd, TCSETS2, &tty);
+  // ioctl(fd, TCSETS2, &tty);
+  ioctl(fd, TCSETS, &tty);
   return 0;
 }
 
